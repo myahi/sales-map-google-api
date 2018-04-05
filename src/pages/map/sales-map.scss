@@ -1,0 +1,21 @@
+sales-map {
+    #map {
+        height: 100%;
+    }
+    .firstHeading{
+        font-weight:bold;
+    }
+    .item ion-thumbnail {
+        min-width: 56px;    
+        min-height: 56px;
+        img {
+            max-width: 56px;
+            min-width: 56px;
+            min-height: 56px;
+            max-height: 56px;
+        }
+    }
+    .makertListItem{
+        padding-left: 0;
+    }
+}

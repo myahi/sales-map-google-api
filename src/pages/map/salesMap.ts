@@ -1,10 +1,9 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { IonicPage, NavController, NavParams} from 'ionic-angular';
-import { AddMarketPage } from '../market/add-market';
+import { IonicPage, NavController, NavParams, Platform} from 'ionic-angular';
 import { DataBaseProvider } from '../../providers/database/database';
 import { MarketTabs } from '../market/market-tabs.component';
 import { MarketModel } from '../../models/market-model';
-
+import { GeolocalisationProvider } from '../../providers/database/geolocalisation';
 declare const google;
 
 @IonicPage()
@@ -17,8 +16,9 @@ export class SalesMap {
   map: any;
   infoWindow = new google.maps.InfoWindow();
   private marketsInMap:Array<MarketModel>=[];
-  private items: Array<String>=[];
-  private markers:Array<any>=[];  
+  private items: Array<any>=[];
+  private markers:Array<any>=[];
+  private displayInMap=true;
   marketIcon  = {
     url: "",
     // This marker is 20 pixels wide by 32 pixels high.
@@ -30,28 +30,32 @@ export class SalesMap {
   };
   
   toggled: boolean;
-  constructor(public navCtrl: NavController, public navParams: NavParams,public dataProvider: DataBaseProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams,public dataProvider: DataBaseProvider,public platform:Platform,public geolocalisationProvider:GeolocalisationProvider) {
+    
   }
 
-
   ionViewDidLoad() {
+    this.toggled=false;
     this.startMap();
   }
   ionViewWillEnter(){
-    //alert("ionViewWillEnter");
-    this.startMap() ;
+    this.toggled=false;
+    this.updateMarkers();
   }
 
-  updateMarker(){
-    let newMarkers=this.dataProvider.getCurrentMarkets().filter(
-      function(e){return this.indexOf(e)<0;},this.marketsInMap);
-
-    if (newMarkers.length>0){
-      newMarkers.forEach(market => {
-        this.addMarker(market,this.map)
-      });
-    }
+  updateMarkers(){
+    let newMakets:Array<MarketModel>=this.dataProvider.getCurrentMarkets();
+    this.marketsInMap.forEach(market => {
+      newMakets = newMakets.filter(item => !item.equals(market));  
+    });
+     if (newMakets.length > 0){
+      newMakets.forEach(newMarket => {
+         this.addMarker(newMarket,this.map)
+         this.marketsInMap.push(newMarket);
+       });
+     }
   }
+
   startMap() {
     let algerCenter = { lat: 36.7525000, lng: 3.0419700 }
     this.map = new google.maps.Map(this.mapElement.nativeElement, {
@@ -68,10 +72,10 @@ export class SalesMap {
     var longpress = false;
     let start=0;
     let end=0;
-
+    let parent=this;
     google.maps.event.addListener(this.map,'click', function (event) {
             if (longpress){
-              this.addMarket();
+              parent.addMarket();
             }  
         });
     google.maps.event.addListener(this.map, 'mousedown', function(event){
@@ -85,50 +89,29 @@ export class SalesMap {
     let markets = this.dataProvider.getCurrentMarkets();
     this.markers=[];
     for (let i = 0; i < markets.length; i++) {
-      //alert(markets[i].lat+" : "+markets[i].lng);
+      //(markets[i].lat+" : "+markets[i].lng);
       this.addMarker(markets[i],this.map)
     }
-    //var MarkerClusterer:any;
+    
     //bug connu
-    var markerCluster =new MarkerClusterer(this.map, this.markers,
+    new MarkerClusterer(this.map, this.markers,
       {imagePath: '../../assets/icon/m'});
-    this.marketsInMap = markets;
-    //this.getCurrentLocation(this.map); 
-    this.map.setCenter(algerCenter);
+    this.marketsInMap = Object.assign([], markets);
+    //this.getCurrentLocation(this.map);
   }
+  
   addMarket (){
-    this.navCtrl.push(MarketTabs,{});
-  }
-  getCurrentLocation(map:any):Promise<Position>{
-    let currentPosition;
-    var infoWindow = new google.maps.InfoWindow({map: map});
-        // Try HTML5 geolocation.
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            currentPosition = pos;
-            infoWindow.setPosition(pos);
-            infoWindow.setContent('Location found.');
-            map.setCenter(pos);
-          }, function() {
-            this.handleLocationError(true, infoWindow, map.getCenter());
-          });
-        } else {
-          // Browser doesn't support Geolocation
-          this.handleLocationError(false, infoWindow, map.getCenter());
-        }
-        return Promise.resolve(currentPosition);
+    let navCtrl = this.navCtrl;
+    this.geolocalisationProvider.getLocation(function(position) {
+      if(position==null){
+        console.log("unable de get current position");
       }
-      handleLocationError(browserHasGeolocation, infoWindow, pos) {
-        infoWindow.setPosition(pos);
-        infoWindow.setContent(browserHasGeolocation ?
-                              'Error: The Geolocation service failed.' :
-                              'Error: Your browser doesn\'t support geolocation.');
+      else {
+        navCtrl.push(MarketTabs,{marketPosition:position});
       }
-
+  })
+};
+  
     toggleSearch() {
         this.toggled = this.toggled ? false : true;
     }
@@ -136,10 +119,15 @@ export class SalesMap {
     initializeItems() {
       this.items=[];
       this.marketsInMap.forEach(market => {
-        this.items.push(market.toString());
+        var item = {
+          title:market.toString(),
+          id:market.marketId
+        }
+        this.items.push(item);
       });
    } 
-    triggerInput(ev: any) {
+    
+   triggerInput(ev: any) {
         // Reset items back to all of the items
         // set val to the value of the searchbar
         let val = ev.target.value;
@@ -148,7 +136,7 @@ export class SalesMap {
           // if the value is an empty string don't filter the items
           if (val && val.trim() != '') {
             this.items = this.items.filter((item) => {
-              return (item.toLowerCase().indexOf(val.toLowerCase()) > -1);
+              return (item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
             })
           }
         }
@@ -166,20 +154,31 @@ export class SalesMap {
       title: market.marketName,
       address: market.marketAddress,
     });
-    let infoWindow = this.infoWindow;
-    let navCtrl = this.navCtrl;
+    
+    let parent = this;
     this.markers.push(marker);
     marker.addListener('click', function() {
-      infoWindow.close();
+      parent.infoWindow.close();
       var div = document.createElement('div');
       div.id="marketInfo";
       var content = '<div id="iw-container">' +
       '<div class="firstHeading">' + marker.title +'</div>' +
       '<div class="iw-content">' + marker.address +'</div></div>';
       div.innerHTML=content;
-      infoWindow.setContent(div);
-      infoWindow.open(map, marker);
-      div.onclick = function(){navCtrl.push(MarketTabs,{marketId:marker.marketId})};
-    }); 
+      parent.infoWindow.setContent(div);
+      parent.infoWindow.open(map, marker);
+      div.onclick = function(){
+        parent.showMarket(marker.marketId);
+      };
+    });
+  }
+  showMarket(id){
+    this.navCtrl.push(MarketTabs,{marketId:id})
+  }
+  showMarketsOnList(){
+    this.displayInMap=false;
+  }
+  showMarketsOnMaps(){
+    this.displayInMap=true;
   }
 }

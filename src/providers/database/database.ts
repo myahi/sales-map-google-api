@@ -34,7 +34,7 @@ export class DataBaseProvider {
   }).catch(e => console.log('data base creation exception ' + e.message));
   }
 
-  public addMarket(market:MarketModel): Promise<MarketModel> {
+  public addMarket(market:MarketModel): any {
     let res: any;
     this.getDataBase().then((db: SQLiteObject) => {
     db.executeSql('INSERT INTO MARKETS VALUES (NULL,?,?,?,?,?,?)', [market.marketName,market.marketCategory,market.marketAddress,market.lat,market.lng,market.marketPhone])

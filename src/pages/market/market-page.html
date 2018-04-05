@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-navbar class="force-back-button">
+          <ion-title>Market</ion-title>
+          <ion-buttons left>
+              <button ion-button icon-only (click)="goHome()">
+                  <ion-icon name="arrow-back"></ion-icon>
+              </button>
+          </ion-buttons>
+          <ion-buttons end>
+                  <button ion-button icon-only (click)="marketId!=null?updateMarket():addMarket()" [disabled]="marketForm.invalid"><ion-icon name="checkmark" ></ion-icon></button>
+                  <button ion-button icon-only *ngIf="marketId!=null"><ion-icon name="trash"></ion-icon></button>
+          </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-list>
+      <form novalidate (ngSubmit)="signup()" [formGroup]="marketForm">
+        <ion-item>
+          <ion-label floating>Name </ion-label>
+          <ion-input name="marketName" type="text" [(ngModel)]="marketData.marketName" formControlName="marketName" [class.error1]="!marketForm.controls.marketName.valid && marketForm.controls.marketName.dirty"></ion-input>
+        </ion-item>
+        <ion-item no-lines *ngIf="( marketForm.get('marketName').hasError('minlength') || marketForm.get('marketName').hasError('maxlength') ||marketForm.get('marketName').hasError('required') ) && marketForm.get('marketName').touched">
+          <div class="error" *ngIf="marketForm.get('marketName').hasError('required') && marketForm.get('marketName').touched">
+            Please input the market name
+          </div>
+          <div class="error" *ngIf="marketForm.get('marketName').hasError('minlength') && marketForm.get('marketName').touched">
+            Minimum 3 characters
+          </div>
+          <div class="error" *ngIf="marketForm.get('marketName').hasError('maxlength') && marketForm.get('marketName').touched">
+            Maximum 30 characters
+          </div>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Category</ion-label>
+          <ion-select name="marketCategory" [(ngModel)]="marketData.marketCategory" name="marketCategory" formControlName="marketCategory" [class.error1]="!marketForm.controls.marketCategory.valid && marketForm.controls.marketCategory.dirty">
+            <ion-option value="supermarket" selected='true'>Supermarket</ion-option>
+            <ion-option value="shop">Shop</ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item no-lines *ngIf="(marketForm.get('marketCategory').hasError('minlength') || marketForm.get('marketCategory').hasError('maxlength') ||marketForm.get('marketCategory').hasError('required') ) && marketForm.get('marketCategory').touched">
+          <div class="error" *ngIf="marketForm.get('marketCategory').hasError('required') && marketForm.get('marketCategory').touched">
+            Please select the market category
+          </div>
+        </ion-item>
+        <ion-item>
+          <ion-label floating>Address</ion-label>
+          <ion-input name="marketAddress" type="text" [(ngModel)]="marketData.marketAddress" formControlName="emptyConrole"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label stacked>Phone</ion-label>
+            <ion-input name="marketPhone" [(ngModel)]="marketData.marketPhone" type="text" name="phone" [brmasker]="{type: 'num',mask:'0000 00-00-00',len:13}" formControlName="emptyPhone"></ion-input>
+        </ion-item>
+      </form>
+    </ion-list>
+  </ion-content>

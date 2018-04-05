@@ -7,27 +7,30 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { DataBaseProvider } from '../providers/database/database';
 import { SQLite } from '@ionic-native/sqlite';
 import { Toast } from '@ionic-native/toast';
-import { AddMarketPage } from '../pages/market/add-market';
+import { MarketPage } from '../pages/market/market-page';
 import { MarketTabs } from '../pages/market/market-tabs.component';
 import { DataBaseProviderMock } from '../providers/database/data-base-mock';
-
+import { BrMaskerModule } from 'brmasker-ionic-3';
+import { GeolocalisationProvider } from '../providers/database/geolocalisation';
+import { Geolocation } from '@ionic-native/geolocation';
 
 
 @NgModule({
   declarations: [
     MyApp,
     MarketTabs,
-    AddMarketPage
+    MarketPage
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
+    BrMaskerModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
     MarketTabs,
-    AddMarketPage
+    MarketPage
   ],
   providers: [
     StatusBar,
@@ -36,7 +39,9 @@ import { DataBaseProviderMock } from '../providers/database/data-base-mock';
    //SQLite,
     {provide:DataBaseProvider,useClass: DataBaseProviderMock},
    //{provide: SQLite, useClass: SQLiteMock},
-    Toast
+    Toast,
+    GeolocalisationProvider,
+    Geolocation
   ]
 })
 export class AppModule {}

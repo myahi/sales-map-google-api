@@ -18,6 +18,7 @@ public getCurrentMarkets():Array<MarketModel>{
   }
 
   public addMarket(market:MarketModel): Promise<MarketModel> {
+    market.marketId=this.markets.length;
     this.markets.push(market);
     return Promise.resolve(market);
     }

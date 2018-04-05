@@ -19,4 +19,7 @@ export class MarketModel {
     toString():string{
         return "Name: " + this.marketName+", Address:" + this.marketAddress;
     }
+    public equals(obj: MarketModel) : boolean {
+        return this.marketId === obj.marketId
+    } 
 }

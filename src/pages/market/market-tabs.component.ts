@@ -1,8 +1,9 @@
 import { Component, ViewChild, NgModule } from '@angular/core';
-import { Platform, Tabs, NavParams, NavController } from 'ionic-angular';
+import { Platform, Tabs, NavParams, NavController, Nav } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { AddMarketPage } from './add-market';
+import { MarketPage } from './market-page';
+import { SalesMap } from '../map/salesMap';
 
 @Component({
   selector: 'tabs-root',
@@ -11,15 +12,16 @@ import { AddMarketPage } from './add-market';
 export class MarketTabs {
   @ViewChild('myTabs') tabRef: Tabs;
   imports: [
-    AddMarketPage
+    MarketPage
   ]
-  tab1Root = AddMarketPage;
-  pages: Array<{ title: string, component: any }>;
-  marketId :any;
+  tab1Root=MarketPage;
+  navigationData :any;
+
   constructor(public navCtrl: NavController,public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,public navParams: NavParams) { 
-    console.log("Passed params", navParams.data);
-    this.marketId = {
-      marketId: this.navParams.get('marketId')
+    this.navigationData = {
+      marketId: this.navParams.get('marketId'),
+      marketPosition: this.navParams.get('marketPosition'),
+      navCtrl:this.navCtrl
     };
   }
 }
