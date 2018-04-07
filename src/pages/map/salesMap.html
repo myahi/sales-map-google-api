@@ -1,58 +1,78 @@
 <ion-header>
-    <ion-navbar color="primary">
-      <button *ngIf="!toggled" ion-button icon-only menuToggle><ion-icon name="menu"></ion-icon></button>
-      <!-- Title -->
-      <ion-title *ngIf="!toggled">Market map</ion-title>
-      <!-- Search Bar -->
-      <ion-searchbar *ngIf="toggled" [(ngModel)]="searchTerm" [showCancelButton]="true" (ionCancel)="toggleSearch()" (ionInput)="triggerInput($event)"></ion-searchbar>
-      <ion-list *ngIf="toggled">
-          <ion-item *ngFor="let item of items" (click)="showMarket(item.id)">
-              {{item.title}}
-          </ion-item>
-      </ion-list>
-      <!-- Map Icon -->    
-      <ion-buttons end *ngIf="!toggled">
-          <button ion-button icon-only (click)="showMarketsOnMaps()"><ion-icon [name]="displayInMap ? 'md-pin' : 'ios-pin-outline'"></ion-icon></button>
-      </ion-buttons>  
-      <!-- List Icon -->    
-      <ion-buttons end *ngIf="!toggled">
-          <button ion-button icon-only (click)="showMarketsOnList()"><ion-icon  [name]="!displayInMap ? 'ios-list-box' : 'ios-list-box-outline'"></ion-icon></button>
-      </ion-buttons>
-      <!-- Search Icon -->    
-      <ion-buttons end *ngIf="!toggled">
-        <button ion-button icon-only (click)="toggleSearch()"><ion-icon name="search"></ion-icon></button>
-      </ion-buttons>  
-    </ion-navbar>
-  </ion-header>
+  <ion-navbar color="primary">
+    <button *ngIf="!toggled" ion-button icon-only menuToggle><ion-icon name="menu"></ion-icon></button>
+    <!-- Title -->
+    <ion-title *ngIf="!toggled">Market map</ion-title>
+    <!-- Search Bar -->
+    <ion-searchbar *ngIf="toggled" [(ngModel)]="searchTerm" [showCancelButton]="true" (ionCancel)="toggleSearch()" (ionInput)="triggerInput($event)"></ion-searchbar>
+    <ion-list *ngIf="toggled">
+        <ion-item *ngFor="let item of items" (click)="showMarket(item.id)">
+            {{item.title}}
+        </ion-item>
+    </ion-list>
+    <!-- Map Icon -->    
+    <ion-buttons end *ngIf="!toggled">
+        <button ion-button icon-only (click)="showMarketsOnMaps()"><ion-icon [name]="displayInMap ? 'md-pin' : 'ios-pin-outline'"></ion-icon></button>
+    </ion-buttons>  
+    <!-- List Icon -->    
+    <ion-buttons end *ngIf="!toggled">
+        <button ion-button icon-only (click)="showMarketsOnList()"><ion-icon  [name]="!displayInMap ? 'ios-list-box' : 'ios-list-box-outline'"></ion-icon></button>
+    </ion-buttons>
+    <!-- Search Icon -->    
+    <ion-buttons end *ngIf="!toggled">
+      <button ion-button icon-only (click)="toggleSearch()"><ion-icon name="search"></ion-icon></button>
+    </ion-buttons>  
+  </ion-navbar>
+</ion-header>
 
 <ion-content padding>
-    <div #map id="map" [hidden]="!displayInMap"></div>
-    <div id="list" [hidden]="displayInMap">
-    <ion-list>
-        <ion-item-sliding *ngFor="let market of marketsInMap; let i=index">
-          <ion-item class="makertListItem" (click)="showMarket(market.marketId)">
-                <!-- <ion-icon name="notifications" item-left></ion-icon> -->
-                <ion-thumbnail item-start>
-                        <img [src]="market.marketCategory=='supermarket' ? '../../assets/icon/supermarket-56.png': '../../assets/icon/market-56.png'">
-                </ion-thumbnail>
-                <p>
-              <span style="font-weight: bold">{{market.marketName}}</span><br>
-              <span>{{market.marketAddress}}</span><br>
-              <span>{{market.marketPhone}}</span>
-            </p>
-          </ion-item>
-        </ion-item-sliding>
-        <ion-item>
-                <ion-label item-right text-right style="font-weight:bold">Total</ion-label>
-                <ion-badge item-end>{{marketsInMap.length}}</ion-badge>
-              </ion-item>
-    </ion-list>
-    </div>
-    <ion-fab bottom right>
-      <button color="danger" ion-fab mini class="fab fab-ios fab-ios-danger" (click)="addMarket()">
-      <ion-icon class="fab-close-icon icon icon-ios ion-ios-close" name="close" role="img" aria-label="close"></ion-icon>
-      <span class="button-inner"><ion-icon name="md-create" role="img" class="icon icon-ios ion-ios-add" aria-label="add"></ion-icon></span>
-      <div class="button-effect"></div>
-      </button>
-    </ion-fab>
+  <div #map id="map" [ngClass]="displayInMap ? 'showMap' : 'hideMap'"></div>
+  <div id="list" [ngClass]="!displayInMap ? 'showMap' : 'hideMap'">
+          <ion-list>
+                  <ion-card *ngFor="let market of marketsInMap; let i=index" class="cards-list-demo">
+                      <ion-card-content>
+                        <ion-card-title (click)="showMarket(market.marketId)">
+                            {{market.marketName}}
+                          </ion-card-title>
+                          <ion-item>
+                          <ion-thumbnail item-start>
+                              <img [src]="market.marketCategory=='supermarket' ? '../../assets/icon/supermarket-56.png': '../../assets/icon/market-56.png'">
+                          </ion-thumbnail>
+                              <h2>{{market.marketAddress}}</h2>
+                              <p>{{market.marketPhone}}</p>
+                            </ion-item>
+                            <ion-buttons end>
+                                <button ion-button icon-only color="light"><ion-icon name="ios-send-outline"></ion-icon></button>
+                                <button ion-button icon-only color="light"><ion-icon name="ios-close-circle-outline"></ion-icon></button>
+                          </ion-buttons>
+                        </ion-card-content>
+                    </ion-card>
+                <!-- <ion-item class="makertListItem" >
+                    <ion-card (click)="showMarket(market.marketId)">
+                        <ion-card-header>
+                          <span style="font-weight: bold">{{market.marketName}}</span><br>
+                        </ion-card-header>
+                      
+                      <ion-thumbnail item-start>
+                              <img [src]="market.marketCategory=='supermarket' ? '../../assets/icon/supermarket-56.png': '../../assets/icon/market-56.png'">
+                                  <p>{{market.marketAddress}}</p>
+                                  <p>{{market.marketPhone}}</p>
+                                
+                      </ion-thumbnail>
+                    </ion-card>
+                </ion-item> -->
+              
+              <ion-item>
+                      <ion-label item-right text-right style="font-weight:bold">Total</ion-label>
+                      <ion-badge item-end>{{marketsInMap.length}}</ion-badge>
+                    </ion-item>
+          </ion-list>
+  </div>
+  <ion-fab bottom right *ngIf="displayInMap">
+    <button color="danger" ion-fab mini class="fab fab-ios fab-ios-danger" (click)="addMarket()">
+    <ion-icon class="fab-close-icon icon icon-ios ion-ios-close" name="close" role="img" aria-label="close"></ion-icon>
+    <span class="button-inner"><ion-icon name="md-create" role="img" class="icon icon-ios ion-ios-add" aria-label="add"></ion-icon></span>
+    <div class="button-effect"></div>
+    </button>
+  </ion-fab>
 </ion-content>

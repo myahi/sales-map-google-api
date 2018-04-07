@@ -13,6 +13,10 @@ import { DataBaseProviderMock } from '../providers/database/data-base-mock';
 import { BrMaskerModule } from 'brmasker-ionic-3';
 import { GeolocalisationProvider } from '../providers/database/geolocalisation';
 import { Geolocation } from '@ionic-native/geolocation';
+import { Network } from '@ionic-native/network';
+import { GoogleMaps } from '@ionic-native/google-maps';
+import { LocationTrackerProvider } from '../providers/geolocation/location-tracker';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 
 
 @NgModule({
@@ -33,15 +37,19 @@ import { Geolocation } from '@ionic-native/geolocation';
     MarketPage
   ],
   providers: [
+    GoogleMaps,
+    SQLite,
+    //DataBaseProvider,
+    Network,
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-   //SQLite,
     {provide:DataBaseProvider,useClass: DataBaseProviderMock},
-   //{provide: SQLite, useClass: SQLiteMock},
     Toast,
-    GeolocalisationProvider,
-    Geolocation
+    //GeolocalisationProvider,
+    Geolocation,
+    LocationTrackerProvider,
+    BackgroundGeolocation
   ]
 })
 export class AppModule {}

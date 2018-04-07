@@ -9,13 +9,14 @@ const DATABASE_FILE_NAME: string = 'data.db';
 export class DataBaseProvider {
   private markets:Array<MarketModel>=[];
   
-  constructor(private sqlite: SQLite,private platform:Platform) {
-    platform.ready().then(() => {
-      this.createDatabase();
-		});
+  constructor(private sqlite: SQLite) {
+    this.createDatabase();
   }
   
   public getCurrentMarkets():Array<MarketModel>{
+    if (this.markets.length==0){
+      this.getAllMarkets().then(function(res){return res});
+    }
     return this.markets;
   }
   private getDataBase() : Promise<SQLiteObject>{
@@ -25,12 +26,12 @@ export class DataBaseProvider {
     });
   };
   
-  public createDatabase() {
-    this.getDataBase().then((db: SQLiteObject) => {
-      db.executeSql('CREATE TABLE IF NOT EXISTS MARKETS (rowid INTEGER PRIMARY KEY, marketName TEXT NOT NULL, marketCategory TEXT NOT NULL, marketAddress TEXT NOT NULL, lat TEXT , lng TEXT,marketPhone TEXT)', {})
+  public createDatabase():Promise<any> {
+    return this.getDataBase().then((db: SQLiteObject) => {
+      db.executeSql('CREATE TABLE IF NOT EXISTS MARKETS (rowId INTEGER PRIMARY KEY, marketName TEXT NOT NULL, marketCategory TEXT NOT NULL, marketAddress TEXT, lat TEXT , lng TEXT,marketPhone TEXT)', {})
       .then(res => {
         console.log('data base created');
-      }).catch(e => console.log('data base creation exception ' + e.message));
+      }).catch(e =>console.log('data base creation exception ' + e.message));
   }).catch(e => console.log('data base creation exception ' + e.message));
   }
 
@@ -42,35 +43,33 @@ export class DataBaseProvider {
           this.markets.push(new MarketModel(res,market.marketName,market.marketCategory,market.marketAddress,market.lat,market.lng,market.marketPhone));
           res=market;
         }).catch(e => {
-          console.log("market creation exception " + e.message);
+          alert("market creation exception " + e.message);
         });
       });
     return Promise.resolve(res);
 }
 
 getAllMarkets() :Promise<MarketModel[]>{
-  let markets: Array<MarketModel> =[];
-  this.getDataBase().then((db: SQLiteObject) => {
-    db.executeSql('SELECT * FROM MARKETS', {})
+  let markets: Array<MarketModel>;
+  this.getDataBase().then((db:SQLiteObject) => {
+    db.executeSql('SELECT * FROM MARKETS',{})
     .then(data => {
       if(data != null && data.rows.length > 0) {
         for(var i = 0; i < data.rows.length; i++) {
-          let market = new MarketModel(data.rows.item(i).rowid,data.rows.item(i).marketName,data.rows.item(i).marketCategory,data.rows.item(i).marketAddress,data.rows.item(i).lat
+          let market = new MarketModel(data.rows.item(i).rowId,data.rows.item(i).marketName,data.rows.item(i).marketCategory,data.rows.item(i).marketAddress,data.rows.item(i).lat
           ,data.rows.item(i).lng,data.rows.item(i).marketPhone);
           markets.push(market);
         }
-        console.log("getAllMarkets=" + markets.length);
     }
-    })
-    .catch(e => console.log(e));
-  }).catch(e => console.log(e));
+    }).catch(e => console.log(e.message));
+  }).catch(e => console.log(e.message));
   return Promise.resolve(markets); 
 }
 
 
   getMarket(marketId): Promise<MarketModel> {
     let db: SQLiteObject
-    return db.executeSql('SELECT * FROM MARKETS WHERE idMarket=?', [marketId])
+    return db.executeSql('SELECT * FROM MARKETS WHERE rowId=?', [marketId])
 		.then((data) => {
 			if(data == null) {
 				return;

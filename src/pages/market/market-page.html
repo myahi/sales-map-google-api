@@ -32,8 +32,8 @@
           </div>
         </ion-item>
         <ion-item>
-          <ion-label stacked>Category</ion-label>
-          <ion-select name="marketCategory" [(ngModel)]="marketData.marketCategory" name="marketCategory" formControlName="marketCategory" [class.error1]="!marketForm.controls.marketCategory.valid && marketForm.controls.marketCategory.dirty">
+          <ion-label floating>Category</ion-label>
+          <ion-select [interface]="action-sheet" name="marketCategory" [(ngModel)]="marketData.marketCategory" name="marketCategory" formControlName="marketCategory" [class.error1]="!marketForm.controls.marketCategory.valid && marketForm.controls.marketCategory.dirty">
             <ion-option value="supermarket" selected='true'>Supermarket</ion-option>
             <ion-option value="shop">Shop</ion-option>
           </ion-select>
@@ -48,7 +48,7 @@
           <ion-input name="marketAddress" type="text" [(ngModel)]="marketData.marketAddress" formControlName="emptyConrole"></ion-input>
         </ion-item>
         <ion-item>
-            <ion-label stacked>Phone</ion-label>
+            <ion-label floating>Phone</ion-label>
             <ion-input name="marketPhone" [(ngModel)]="marketData.marketPhone" type="text" name="phone" [brmasker]="{type: 'num',mask:'0000 00-00-00',len:13}" formControlName="emptyPhone"></ion-input>
         </ion-item>
       </form>

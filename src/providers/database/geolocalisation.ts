@@ -11,25 +11,26 @@ export class GeolocalisationProvider {
         return (this.platform.is('core') || this.platform.is('mobileweb'));
       }
 
-      getLocation(callback){
+    getLocation(callback){
           // Try HTML5 geolocation.
-          if (this.isInWeb() && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position){
-                callback(position);
-            },function(){
-                callback(null);
-            },{
-                enableHighAccuracy: false,
-                timeout: 300,
-                maximumAge: 0
-              });
-          }
-        else {
+        //   if (this.isInWeb() && navigator.geolocation) {
+        //     navigator.geolocation.getCurrentPosition(function(position){
+        //         callback(position);
+        //     },function(){
+        //         callback(null);
+        //     },{
+        //         enableHighAccuracy: false,
+        //         timeout: 300,
+        //         maximumAge: 0
+        //       });
+        //   }
+        // else {
             this.geolocation.getCurrentPosition().then((position) => {
                 callback(position);
             }).catch((error) => {
+                alert(error.message);
                 callback(null);
             });
         }
         }
-}
+//}
